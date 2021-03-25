@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",
+    "module": "commonjs",
+    "declaration": true,
+    "outDir": "lib",
+    "jsx": "react",
+    "strict": true,
+    "lib": ["ESNext"],
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false
+  },
+  "include": ["**/*"]
+}
