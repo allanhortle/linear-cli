@@ -1,6 +1,6 @@
 {
   "name": "linear-cli",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "main": "lib/index.js",
   "repository": "git@github.com:allanhortle/linear-cli.git",
   "author": "Allan Hortle <allanhortle@gmail.com>",
