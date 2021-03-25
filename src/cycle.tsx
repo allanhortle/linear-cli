@@ -1,10 +1,15 @@
 import React, {useState, useRef, useEffect} from 'react';
 import {render, Text, Box, Spacer} from 'ink';
-import {LinearClient, Issue, WorkflowState} from '@linear/sdk';
+import {LinearClient, Cycle, Issue, User, Project, WorkflowState} from '@linear/sdk';
 
-function Cycle(props) {
+type LocalIssue = {
+    state: WorkflowState;
+    assignee: User;
+    project: Project;
+};
+function Cycle(props: {cycle: Cycle; issues: Array<Issue & LocalIssue>}) {
     const order = ['started', 'unstarted', 'completed', 'canceled'];
-    const {completedScopeHistory, scopeHistory, name, number} = props.cycle;
+    const {completedScopeHistory = [], scopeHistory = [], name, number} = props.cycle;
     const done = completedScopeHistory[completedScopeHistory.length - 1];
     const total = scopeHistory[scopeHistory.length - 1];
     return (
@@ -20,9 +25,12 @@ function Cycle(props) {
                 </Text>
             </Box>
             {props.issues
-                .sort((aa, bb) => bb.state.position - aa.state.position)
-                .sort((aa, bb) => order.indexOf(aa.state.type) - order.indexOf(bb.state.type))
-                .map((issue: Issue, index: number) => (
+                .sort((aa, bb) => Number(bb.state.position) - Number(aa.state.position))
+                .sort(
+                    (aa, bb) =>
+                        order.indexOf(aa.state.type || '') - order.indexOf(bb.state.type || '')
+                )
+                .map((issue, index: number) => (
                     <Box key={index}>
                         <Text color="grey">{issue.identifier} </Text>
                         <Box width={12}>
@@ -49,14 +57,21 @@ function Cycle(props) {
     );
 }
 
-export default async function cycle(props: {linearClient: LinearClient}) {
+export default async function cycle(props: {linearClient: LinearClient; env: any}) {
     //const me = await props.linearClient.viewer;
 
-    const offset = parseInt(props.env.args[1] || 0);
+    const offset = parseInt(props.env?.args[1] || 0);
     const cycles = await props.linearClient.cycles();
-    const currentCycle = cycles.nodes.filter((ii) => ii.endsAt > new Date()).reverse()[offset];
+    const currentCycle = (cycles || {}).nodes
+        ?.filter((ii) => (ii.endsAt || 0) > new Date())
+        .reverse()[offset];
 
-    const issues = await props.linearClient.client.rawRequest(
+    const issues = await props.linearClient.client.rawRequest<
+        {
+            cycle: Cycle & {issues: {nodes: Issue[]}};
+        },
+        {}
+    >(
         `
         query cycle($id: String!) {
               cycle(id: $id) {
@@ -76,8 +91,13 @@ export default async function cycle(props: {linearClient: LinearClient}) {
               }
                   }
     `,
-        {id: currentCycle.id}
+        {id: currentCycle?.id}
     );
     //console.log(issues.data.);
-    render(<Cycle cycle={issues.data.cycle} issues={issues.data.cycle.issues.nodes} />);
+    render(
+        <Cycle
+            cycle={issues.data?.cycle}
+            issues={issues.data?.cycle.issues.nodes || new Array<Issue>()}
+        />
+    );
 }

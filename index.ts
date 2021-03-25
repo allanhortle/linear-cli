@@ -2,6 +2,7 @@
 import {program} from 'commander';
 import pkg from './package.json';
 import cycle from './src/cycle';
+import issue from './src/issue';
 import {LinearClient} from '@linear/sdk';
 
 const linearClient = new LinearClient({apiKey: process.env.LINEAR_TOKEN});
@@ -13,6 +14,13 @@ program
     .description('list issues for the current or future cycle')
     .action(async (offset, env) => {
         return await cycle({linearClient, env});
+    });
+
+program
+    .command('issue [id]')
+    .description('list issues for the current or future cycle')
+    .action(async (id, env) => {
+        return await issue({linearClient, id, env});
     });
 
 program.on('--help', () => {
