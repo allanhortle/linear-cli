@@ -110,7 +110,7 @@ export default async function cycle(props: {linearClient: LinearClient; env: any
     //console.log(issues.data.);
     render(
         <CycleView
-            cycle={issues.data?.cycle}
+            cycle={issues.data.cycle}
             issues={
                 (issues.data?.cycle.issues.nodes as Array<Issue & LocalIssue>) ||
                 new Array<Issue & LocalIssue>()

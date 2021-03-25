@@ -13,14 +13,14 @@ program
     .command('cycle [offset]')
     .description('list issues for the current or future cycle')
     .action(async (offset, env) => {
-        return await cycle({linearClient, env});
+        await cycle({linearClient, env});
     });
 
 program
     .command('issue [id]')
     .description('list issues for the current or future cycle')
     .action(async (id, env) => {
-        return await issue({linearClient, id, env});
+        await issue({linearClient, id, env});
     });
 
 program.on('--help', () => {
