@@ -7,7 +7,10 @@ type LocalIssue = {
     assignee: User;
     project: Project;
 };
-function Cycle(props: {cycle: Cycle; issues: Array<Issue & LocalIssue>}) {
+type LocalCycle = {
+    issues: {nodes: Issue[]};
+};
+function CycleView(props: {cycle: Cycle & LocalCycle; issues: Array<Issue & LocalIssue>}) {
     const order = ['started', 'unstarted', 'completed', 'canceled'];
     const {completedScopeHistory = [], scopeHistory = [], name, number} = props.cycle;
     const done = completedScopeHistory[completedScopeHistory.length - 1];
@@ -68,36 +71,50 @@ export default async function cycle(props: {linearClient: LinearClient; env: any
 
     const issues = await props.linearClient.client.rawRequest<
         {
-            cycle: Cycle & {issues: {nodes: Issue[]}};
+            cycle: Cycle & LocalCycle;
         },
         {}
     >(
         `
-        query cycle($id: String!) {
-              cycle(id: $id) {
-              number
-              name
-              completedScopeHistory,
-              scopeHistory,
+            query cycle($id: String!) {
+                cycle(id: $id) {
+                    number
+                    name
+                    completedScopeHistory
+                    scopeHistory
                     issues {
-                    nodes {
-                        identifier
-                        title
-                        state {type, color, name, position}
-                        assignee {name}
-                        project {name, color}
+                        nodes {
+                            identifier
+                            title
+                            state {
+                                type
+                                color
+                                name
+                                position
+                            }
+                            assignee {
+                                name
+                            }
+                            project {
+                                name
+                                color
+                            }
                         }
                     }
-              }
-                  }
-    `,
+                }
+            }
+        `,
         {id: currentCycle?.id}
     );
+    if (!issues.data?.cycle) return null;
     //console.log(issues.data.);
     render(
-        <Cycle
+        <CycleView
             cycle={issues.data?.cycle}
-            issues={issues.data?.cycle.issues.nodes || new Array<Issue>()}
+            issues={
+                (issues.data?.cycle.issues.nodes as Array<Issue & LocalIssue>) ||
+                new Array<Issue & LocalIssue>()
+            }
         />
     );
 }

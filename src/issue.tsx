@@ -1,16 +1,16 @@
-import React, {useState, useRef, useEffect} from 'react';
-import {render, Text, Box, Spacer} from 'ink';
-import {LinearClient, Cycle, Issue, User, Project, WorkflowState, Label} from '@linear/sdk';
+import React from 'react';
+import {render, Text, Box} from 'ink';
+import {LinearClient, Cycle, User, Project, WorkflowState, Issue, IssueLabel} from '@linear/sdk';
 import KeyValueTable from './affordance/KeyValueTable';
 import {format} from 'stringdate';
 
-function Issue(props: {
+function IssueView(props: {
     issue: Issue;
     state: WorkflowState;
     assignee?: User;
     cycle?: Cycle;
     project?: Project;
-    labels?: Array<Label>;
+    labels?: Array<IssueLabel>;
 }) {
     const {issue, state, cycle, project, labels} = props;
     const {title, identifier} = props.issue;
@@ -54,7 +54,7 @@ function Issue(props: {
     );
 }
 
-export default async function cycle(props: {linearClient: LinearClient; id: string; env: any}) {
+export default async function issue(props: {linearClient: LinearClient; id: string; env: any}) {
     const issue = await props.linearClient.issue(props.id);
     if (!issue) return null;
     const [state, assignee, cycle, project, labels] = await Promise.all([
@@ -67,7 +67,7 @@ export default async function cycle(props: {linearClient: LinearClient; id: stri
     if (!state) return null;
 
     render(
-        <Issue
+        <IssueView
             issue={issue}
             state={state}
             assignee={assignee}
