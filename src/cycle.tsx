@@ -13,7 +13,6 @@ type Props = {
 function sortIssues(grouping: string, issues: Array<Issue>) {
     if (grouping === 'state') {
         const order = ['started', 'unstarted', 'completed', 'canceled'];
-        console.log({grouping});
         return issues
             .sort((aa, bb) => Number(bb.state.position) - Number(aa.state.position))
             .sort((a, b) => order.indexOf(a.state.type || '') - order.indexOf(b.state.type || ''))
@@ -21,6 +20,7 @@ function sortIssues(grouping: string, issues: Array<Issue>) {
 
     return sortBy(ii => ii[grouping]?.name || 'ZZZZZZ')(issues);
 }
+
 function CycleView(props: Props) {
     const {cycle, group} = props;
     const {completedScopeHistory = [], scopeHistory = [], name, number} = cycle;
@@ -112,6 +112,5 @@ export default async function cycle(props: {linearClient: LinearClient; group: s
         {id: currentCycle.id || ''}
     );
     if (!data) return null;
-    render(<CycleView group={props.group}
-        cycle={data.cycle} />);
+    render(<CycleView group={props.group} cycle={data.cycle} />);
 }

@@ -9,6 +9,7 @@
         "lib": [
             "ESNext"
         ],
+        "rootDir": "src",
         "removeComments": true,
         "skipLibCheck": true,
         "resolveJsonModule": true,
@@ -16,8 +17,7 @@
         "noImplicitAny": false
     },
     "include": [
-        "src/**/*",
-        "index.tsx"
+        "src/**/*"
     ],
     "exclude": [
         "node_modules"

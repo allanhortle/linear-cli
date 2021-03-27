@@ -1,13 +1,14 @@
 #!/usr/bin/env node
-import {program, CommandOptions} from 'commander';
-import pkg from './package.json';
-import cycle from './src/cycle';
-import issue from './src/issue';
-import Error from './src/affordance/Error';
+import {program} from 'commander';
+import cycle from './cycle';
+import issue from './issue';
+import Error from './affordance/Error';
 import React from 'react';
 import {LinearClient} from '@linear/sdk';
 import {render, Text, Box} from 'ink';
 import {default as InkSpinner} from 'ink-spinner';
+
+const pkg = require('../package.json');
 
 function Spinner(props) {
     return <Box>
