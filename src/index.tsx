@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import {program} from 'commander';
-import cycle from './cycle';
-import issue from './issue';
+import CycleView from './cycle/CycleView';
+import IssueView from './issue/IssueView';
+import ProjectView from './project/ProjectView';
 import Error from './affordance/Error';
 import React from 'react';
 import {LinearClient} from '@linear/sdk';
@@ -11,19 +12,20 @@ import {default as InkSpinner} from 'ink-spinner';
 const pkg = require('../package.json');
 
 function Spinner(props) {
-    return <Box>
-        <Text color="yellow">
-            <InkSpinner type="dots" />
-        </Text>
-        <Text> {props.children}</Text>
-    </Box>
+    return (
+        <Box>
+            <Text color="yellow">
+                <InkSpinner type="dots" />
+            </Text>
+            <Text> {props.children}</Text>
+        </Box>
+    );
 }
 
 async function wrapView(view: Function, message?: string) {
     try {
         render(<Spinner>{message}</Spinner>);
         await view();
-
     } catch (e) {
         render(<Error error={e} />);
     }
@@ -48,18 +50,20 @@ program
         if (env.project) group = 'project';
         if (env.assignee) group = 'assignee';
         return wrapView(
-            () => cycle({linearClient, group, offset: parseInt(offset, 10), env}),
+            () => CycleView({linearClient, group, offset: parseInt(offset, 10)}),
             'Fetching Cycle'
-        )
+        );
     });
 
 program
-    .command('issue [id]')
-    .description('list issues for the current or future cycle')
-    .action(async (id, env) => wrapView(
-        () => issue({linearClient, id, env}),
-        'Fetching Issue'
-    ));
+    .command('issue [id] <subcommand>')
+    .description('show details on an issue')
+    .action(async (id, env) => wrapView(() => IssueView({linearClient, id}), 'Fetching Issue'));
+
+program
+    .command('project [id]')
+    .description('list issues for the a project')
+    .action(async (id, env) => wrapView(() => ProjectView({linearClient, id}), 'Fetching Project'));
 
 program.on('--help', () => {
     console.log('');

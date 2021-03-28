@@ -1,0 +1,11 @@
+overwrite: true
+schema: https://api.linear.app/graphql
+documents: "src/**/*.{ts,tsx}"
+generates:
+  src/generated/graphql.d.ts:
+    config:
+      preResolveTypes: true
+      skipTypename: true
+    plugins:
+      - "typescript"
+      - "typescript-operations"
